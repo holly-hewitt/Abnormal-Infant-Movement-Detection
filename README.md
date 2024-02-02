@@ -1,20 +1,24 @@
 # Abnormal Infant Movement Detection
- Abnormal Infant Movement Detection from Accelerometer data
 
-Cerebral Palsy (CP) affects approximately 1 in 400 individuals in the United Kingdom,
-underscoring its prevalence and societal impact. The significance of early CP diagnosis cannot
-be overstated, as interventions during infancy capitalise on heightened brain plasticity,
-yielding substantial improvements. Presently, diagnostic methods for CP in infants involve
-costly scans and Movement Assessment, the latter demanding extensive clinician training and
-being susceptible to subjectivity and observer fatigue. The integration of machine learning
-techniques for automated analysis of infant movement data emerges as a promising avenue,
-offering an alternative means to identify infants at risk of developing developmental disorders
-like CP, thereby contributing to diagnostic processes.
+## Introduction
 
-This project involves a dataset with 21 Typically Developing Infants and 13 infants at risk of
-developing CP due to Perinatal Stroke (confirmed via MRI). Axivity WAX9 IMU sensors were
-placed on wrists and ankles, recording monthly data from term age to 6 months. Sessions involved
-ten-minute recordings with infants lying supine with each trial annotated by a clinician with
-movement assessment results. In this project we aim to develop models which can automatically
-predict movement assessment results from sensor data, and we will use the collected data to train
-and test our models.
+Cerebral Palsy (CP) is a prevalent condition, affecting approximately 1 in 400 individuals in the United Kingdom, thus underscoring its societal impact. Early diagnosis of CP holds immense significance, as interventions during infancy take advantage of heightened brain plasticity, leading to substantial improvements. Current diagnostic methods involve expensive scans and Movement Assessment, the latter requiring extensive clinician training and being susceptible to subjectivity and observer fatigue. This project explores the integration of machine learning techniques for the automated analysis of infant movement data as a promising alternative, aiming to identify infants at risk of developing developmental disorders like CP and contributing to more efficient diagnostic processes.
+
+## Project Overview
+
+### Dataset
+
+The dataset comprises 21 Typically Developing Infants and 13 infants at risk of developing CP due to Perinatal Stroke, confirmed through MRI. Axivity WAX9 IMU sensors were strategically placed on wrists and ankles, capturing monthly data from term age to 6 months. Each session involved ten-minute recordings with infants lying supine, and each trial was meticulously annotated by a clinician with movement assessment results.
+
+### Objectives
+
+The primary goal of this project is to develop machine learning models capable of automatically predicting movement assessment results from sensor data. Leveraging the collected dataset, our approach involves the training and testing of these models to enhance the accuracy and efficiency of diagnosing infants at risk of developmental disorders, particularly CP.
+
+## Getting Started
+
+To explore and contribute to this project, please refer to the following sections:
+
+- [Installation](#installation): Guidelines for setting up the necessary environment.
+- [Usage](#usage): Instructions on how to use and interact with the developed models.
+
+
