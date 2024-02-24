@@ -1,0 +1,108 @@
+Model: def create_model(filters=32, kernel_size=3, dropout_rate=0.5):    
+    model = Sequential()
+    model.add(Masking(mask_value=0., input_shape=(19301, 16)))  # Adjust the input_shape to match your dataset
+    model.add(Conv1D(filters, kernel_size, activation='relu', input_shape=(19301, 16)))
+    model.add(MaxPooling1D(2))
+    model.add(Flatten())
+    model.add(Dense(32, activation='relu'))  # Reduced the number of neurons in the dense layer
+    model.add(Dense(3, activation='softmax'))
+    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+    return model
+
+    Results:
+
+    Dataset: X_smoothed_mean_norm
+    Accuracy: 0.646780303030303 +/- 0.09973348898243625
+    Sensitivity: 0.25665445665445663 +/- 0.20892954310299036
+    False Positive Rate: 0.10536689549961861 +/- 0.08887055485462426
+    Specificity: 0.8946331045003815 +/- 0.08887055485462426
+    Precision: 0.4442424242424242 +/- 0.23422184236678187
+
+
+    Dataset: X_smoothed_median_norm
+    Accuracy: 0.6096590909090909 +/- 0.08332343260744607
+    Sensitivity: 0.2796703296703297 +/- 0.20223134745596413
+    False Positive Rate: 0.15133790999237223 +/- 0.10233053478672907
+    Specificity: 0.8486620900076278 +/- 0.10233053478672907
+    Precision: 0.47555555555555556 +/- 0.08703624901140507
+
+    Dataset: X_smoothed_mean_norm_month
+    Accuracy: 0.696780303030303 +/- 0.09978095269929742
+    Sensitivity: 0.6442111633599048 +/- 0.07147403266931529
+    False Positive Rate: 0.1610282227307399 +/- 0.08355097822644932
+    Specificity: 0.8389717772692601 +/- 0.08355097822644932
+    Precision: 0.6796386528957743 +/- 0.06602168250829586
+
+
+    Dataset: X_smoothed_median_norm_month
+    Accuracy: 0.602840909090909 +/- 0.07257174421116831
+    Sensitivity: 0.5478065649072514 +/- 0.028490875610738826
+    False Positive Rate: 0.26574218154080853 +/- 0.1448530873374119
+    Specificity: 0.7342578184591915 +/- 0.1448530873374119
+    Precision: 0.5717232183021658 +/- 0.05136835587495588
+
+Model + class weights:
+
+    Added these lines of code: Y_train_classes = np.argmax(Y_train, axis=1)
+
+    # Compute class weights
+    class_weights = class_weight.compute_class_weight('balanced',
+                                                  classes=np.unique(Y_train_classes),
+                                                  y=Y_train_classes)
+
+    class_weights_dict = dict(enumerate(class_weights))
+            
+    model = create_model()
+    early_stopping = EarlyStopping(monitor='val_loss', patience=5)
+            
+    #Fit the model
+    print('Fitting model')
+    model.fit(X_train, Y_train, epochs=5, batch_size=4, validation_split=0.2, callbacks=[early_stopping], verbose=1, class_weight=class_weights_dict)
+
+    Results:
+
+    Dataset: X_smoothed_mean_norm_month
+    Accuracy: 0.6647727272727273 +/- 0.0838910401149625
+    Sensitivity: 0.6190784653942548 +/- 0.05380697436809445
+    False Positive Rate: 0.2847368421052632 +/- 0.17972277821219615
+    Specificity: 0.7152631578947368 +/- 0.17972277821219615
+    Precision: 0.6708892921960073 +/- 0.1254850274162541
+
+
+    Dataset: X_smoothed_median_norm_month
+    Accuracy: 0.5964015151515152 +/- 0.08064135064236685
+    Sensitivity: 0.569601900514944 +/- 0.05950890215341311
+    False Positive Rate: 0.22776811594202898 +/- 0.23781660333121363
+    Specificity: 0.772231884057971 +/- 0.23781660333121363
+    Precision: 0.6489949882853109 +/- 0.11374857902563865
+
+Model: def create_lstm_model(input_shape=(19301, 16), lstm_units=32, dropout_rate=0.5, output_classes=3):
+    model = Sequential()
+    # Masking layer to ignore the padded values
+    model.add(Masking(mask_value=0., input_shape=input_shape))
+    
+    # LSTM layer
+    model.add(LSTM(lstm_units, return_sequences=False))  # 'return_sequences=False' because we only need the last output
+    
+    # Dropout for regularization
+    model.add(Dropout(dropout_rate))
+    
+    # A Dense layer for further processing
+    model.add(Dense(lstm_units, activation='relu'))
+    
+    # The output layer with softmax activation for classification
+    model.add(Dense(output_classes, activation='softmax'))
+    
+    # Compile the model
+    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+    
+    return model
+
+    Results:
+
+    Dataset: X_smoothed_mean_norm
+    Accuracy: 0.6221590909090909 +/- 0.091334233170046
+    Sensitivity: 0.5631581462016244 +/- 0.03973388710234313
+    False Positive Rate: 0.12478260869565216 +/- 0.10477809840554486
+    Specificity: 0.8752173913043478 +/- 0.10477809840554486
+    Precision: 0.5646171624074849 +/- 0.18730767262714967
