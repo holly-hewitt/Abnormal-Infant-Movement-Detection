@@ -345,3 +345,160 @@ GRU NCW:
     False Positive Rate: 0.03795877325289091 +/- 0.03705996907427321
     Specificity: 0.9620412267471091 +/- 0.03705996907427321
     Precision: 0.529270806551284 +/- 0.1939256164596628
+
+Model: def create_cnn_lstm_model(shape, filters=32, kernel_size=3, lstm_units=64, dropout_rate=0.5, output_classes=3):
+    model = Sequential()
+    model.add(Masking(mask_value=0., input_shape=shape))
+    model.add(Conv1D(filters, kernel_size, activation='relu'))
+    model.add(MaxPooling1D(2))
+    model.add(LSTM(lstm_units, return_sequences=False))
+    model.add(Dropout(dropout_rate))
+    model.add(Dense(lstm_units, activation='relu'))
+    model.add(Dense(output_classes, activation='softmax'))
+    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+    return model
+
+    Results:
+
+    Dataset: X_smoothed_mean_norm_month
+    Accuracy: 0.6769159096203121 +/- 0.01911506008751798
+    Sensitivity: 0.6157115072749747 +/- 0.03985426215307625
+    False Positive Rate: 0.10969259498671265 +/- 0.07080763067747102
+    Specificity: 0.8903074050132873 +/- 0.07080763067747102
+    Precision: 0.6700860733469428 +/- 0.06141791321186676
+
+
+    Dataset: X_smoothed_median_norm_month
+    Accuracy: 0.664803167947822 +/- 0.03833111152458655
+    Sensitivity: 0.6179354872853325 +/- 0.029901926178971267
+    False Positive Rate: 0.13700351935646057 +/- 0.09687660681428033
+    Specificity: 0.8629964806435394 +/- 0.09687660681428033
+    Precision: 0.6855392156862745 +/- 0.07598105370892727
+
+
+    Dataset: X_smoothed_mean_norm
+    Accuracy: 0.5533426508269276 +/- 0.06634074250713362
+    Sensitivity: 0.5055555555555555 +/- 0.009726330492941079
+    False Positive Rate: 0.1794871794871795 +/- 0.2538332035028632
+    Specificity: 0.8205128205128206 +/- 0.2538332035028632
+    Precision: 0.527612231620039 +/- 0.18222839789197323
+
+
+    Dataset: X_smoothed_median_norm
+    Accuracy: 0.6212438853948288 +/- 0.09184660529527838
+    Sensitivity: 0.5241050401267119 +/- 0.035818675010681617
+    False Positive Rate: 0.07927529986353517 +/- 0.06885037256436562
+    Specificity: 0.9207247001364648 +/- 0.06885037256436562
+    Precision: 0.48718833705027914 +/- 0.16467190501756748
+
+Model: def create_cnn_gru_model(shape, filters=32, kernel_size=3, gru_units=64, dropout_rate=0.5, output_classes=3):
+    model = Sequential()
+    model.add(Masking(mask_value=0., input_shape=shape))
+    model.add(Conv1D(filters, kernel_size, activation='relu'))
+    model.add(MaxPooling1D(2))
+    model.add(GRU(gru_units, return_sequences=False))
+    model.add(Dropout(dropout_rate))
+    model.add(Dense(gru_units, activation='relu'))
+    model.add(Dense(output_classes, activation='softmax'))
+    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+    return model
+
+    Dataset: X_smoothed_mean_norm_month
+    Accuracy: 0.6649196366177498 +/- 0.0432389054767609
+    Sensitivity: 0.6128893122701172 +/- 0.012363283085529862
+    False Positive Rate: 0.10382101558572147 +/- 0.12659853577106672
+    Specificity: 0.8961789844142786 +/- 0.12659853577106672
+    Precision: 0.7213236993192199 +/- 0.07868883578932385
+
+
+    Dataset: X_smoothed_median_norm_month
+    Accuracy: 0.6461681807593758 +/- 0.027850871303358872
+    Sensitivity: 0.5937789420761557 +/- 0.03377079465364692
+    False Positive Rate: 0.1455505279034691 +/- 0.10342003771591211
+    Specificity: 0.8544494720965309 +/- 0.1034200377159121
+    Precision: 0.6618001930501931 +/- 0.09541872168089212
+
+
+    Dataset: X_smoothed_mean_norm
+    Accuracy: 0.6150710458886559 +/- 0.07056290676832261
+    Sensitivity: 0.57997557997558 +/- 0.07265213773290473
+    False Positive Rate: 0.20329670329670327 +/- 0.2387845755102075
+    Specificity: 0.7967032967032966 +/- 0.2387845755102075
+    Precision: 0.5378331603988314 +/- 0.1715353164013266
+
+
+    Dataset: X_smoothed_median_norm
+    Accuracy: 0.5780340088516188 +/- 0.045516158865198796
+    Sensitivity: 0.5294871794871795 +/- 0.02917899147882317
+    False Positive Rate: 0.15384615384615385 +/- 0.2175713172881685
+    Specificity: 0.8461538461538461 +/- 0.2175713172881685
+    Precision: 0.5468204053109713 +/- 0.18112110228082753
+
+
+Model: def create_lstm_attention_model(shape, lstm_units=64, dropout_rate=0.5, output_classes=3):
+    inputs = Input(shape=shape)
+    lstm_out = LSTM(lstm_units, return_sequences=True)(inputs)
+    attention = Dense(1, activation='tanh')(lstm_out)
+    attention = Flatten()(attention)
+    attention = Activation('softmax')(attention)
+    attention = RepeatVector(lstm_units)(attention)
+    attention = Permute([2, 1])(attention)
+    sent_representation = Multiply()([lstm_out, attention])
+    sent_representation = Lambda(lambda xin: K.sum(xin, axis=-2), output_shape=(lstm_units,))(sent_representation)
+    dropout = Dropout(dropout_rate)(sent_representation)
+    dense = Dense(lstm_units, activation='relu')(dropout)
+    outputs = Dense(output_classes, activation='softmax')(dense)
+    model = Model(inputs=inputs, outputs=outputs)
+    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+    return model
+
+    Dataset: X_smoothed_mean_norm_month
+    Accuracy: 0.6274167249010016 +/- 0.012508323056914815
+    Sensitivity: 0.5778968537482468 +/- 0.015596612294387073
+    False Positive Rate: 0.15158371040723984 +/- 0.12565560076175752
+    Specificity: 0.8484162895927602 +/- 0.12565560076175752
+    Precision: 0.6476161333566474 +/- 0.09790476040397277
+
+
+    Dataset: X_smoothed_median_norm_month
+    Accuracy: 0.6461681807593758 +/- 0.07913684023441717
+    Sensitivity: 0.5629144505305496 +/- 0.030967887489186944
+    False Positive Rate: 0.06359979889391654 +/- 0.04535070379743313
+    Specificity: 0.9364002011060834 +/- 0.04535070379743313
+    Precision: 0.6838433901497889 +/- 0.05780811865694696
+
+
+    Dataset: X_smoothed_mean_norm
+    Accuracy: 0.5779175401816912 +/- 0.03162462193985954
+    Sensitivity: 0.5173202614379085 +/- 0.023029747464545117
+    False Positive Rate: 0.1465560583207642 +/- 0.18685051009477466
+    Specificity: 0.8534439416792359 +/- 0.18685051009477466
+    Precision: 0.5365600388391412 +/- 0.18474064095910184
+
+
+    Dataset: X_smoothed_median_norm
+    Accuracy: 0.516072676450035 +/- 0.07262659778488388
+    Sensitivity: 0.5279934375909608 +/- 0.026444915924081148
+    False Positive Rate: 0.3288084464555053 +/- 0.2836959333267295
+    Specificity: 0.6711915535444947 +/- 0.2836959333267295
+    Precision: 0.4480251554812958 +/- 0.13475510820199174
+
+Model: CNN LSTM CW
+
+    Results:
+
+    Dataset: X_smoothed_mean_norm_month
+    Accuracy: 0.5593990216631726 +/- 0.09442283946952112
+    Sensitivity: 0.5754509766119673 +/- 0.06786349274274525
+    False Positive Rate: 0.40065000359118 +/- 0.18923893454909904
+    Specificity: 0.5993499964088199 +/- 0.18923893454909907
+    Precision: 0.5812448400412796 +/- 0.0710910525083769
+
+Model: CNN LSTM NCW
+    Dataset: X_smoothed_mean_norm_month
+    Best Hyperparameters: {'filters': 32, 'kernel_size': 3, 'lstm_units': 32, 'dropout_rate': 0.5}
+    accuracy 0.75
+    sensitivity 0.6570048309178744
+    false positive rate 0.13043478260869568
+    specificities 0.8695652173913043
+    precision 0.6857142857142857
