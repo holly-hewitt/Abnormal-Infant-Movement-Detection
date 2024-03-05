@@ -1,2 +1,6 @@
 # Ignore data files
 /data
+/Code/drive/
+/Code/pickles/
+/Code/.ipynb_checkpoints
+/Code/Random Files
